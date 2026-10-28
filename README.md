@@ -43,9 +43,11 @@ type CatalogItem = {
   itemId: string;              // ID game kanonis, termasuk enchantment bila relevan
   displayName: string;
   tier?: number;
+  enchantment: number;
   category?: string;
   purchasable: boolean;        // true hanya untuk terminal terverifikasi
   terminalStatus: "terminal" | "requires_recipe" | "unknown" | "unsupported";
+  sourceUrl: string;
 };
 
 type Recipe = {
@@ -54,13 +56,17 @@ type Recipe = {
   ingredients: Array<{
     itemId: string;
     quantity: number;
+    returnEligible?: boolean;  // metadata per bahan crafting
   }>;
   recipeType: "crafting" | "refining";
+  craftBonusCity?: string;
+  validationStatus: string;
+  notes?: string;
   sourceUrl: string;
 };
 ```
 
-Kontrak saat ini adalah `schemaVersion: "2"`; consumer harus memeriksa versi manifest sebelum memuat katalog.
+Kontrak saat ini adalah `schemaVersion: "3"`; consumer harus memeriksa versi manifest sebelum memuat katalog. Field inti calculator (`itemId`, `purchasable`, `outputQuantity`, dan ingredient quantity) tetap kompatibel secara struktural.
 
 Aturan:
 - Kebutuhan artifact, Wood, Stone, material khusus, serta tier sebelumnya **harus dipertahankan**, tidak boleh disamakan dengan Ore/Hide/Fiber.

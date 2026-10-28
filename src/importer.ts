@@ -14,10 +14,16 @@ const required = (row: CsvRow, key: string): string => {
 
 const optional = (row: CsvRow, key: string): string | undefined => row.values[key]?.trim() || undefined;
 
-const integer = (row: CsvRow, key: string, optionalValue = false): number | undefined => {
+const positiveInteger = (row: CsvRow, key: string, optionalValue = false): number | undefined => {
   const raw = optional(row, key);
   if (raw === undefined && optionalValue) return undefined;
   if (raw === undefined || !/^\d+$/.test(raw) || Number(raw) <= 0) throw new Error(`CSV line ${row.line}: '${key}' must be a positive integer`);
+  return Number(raw);
+};
+
+const enchantment = (row: CsvRow): number => {
+  const raw = required(row, "enchantment");
+  if (!/^[0-4]$/.test(raw)) throw new Error(`CSV line ${row.line}: 'enchantment' must be an integer from 0 to 4`);
   return Number(raw);
 };
 
@@ -35,17 +41,19 @@ function parseItems(rows: CsvRow[]): CatalogItem[] {
     seen.add(itemId);
     const hasCraftingRecipe = boolean(row, "has_crafting_recipe");
     const hasRefiningRecipe = boolean(row, "has_refining_recipe");
-    const tier = integer(row, "tier", true);
+    const tier = positiveInteger(row, "tier", true);
     const category = optional(row, "category");
     const terminalStatus = classifyMaterial(itemId, category, hasCraftingRecipe || hasRefiningRecipe);
     const item: CatalogItem = {
       itemId,
       displayName: optional(row, "display_name_en") ?? itemId,
+      enchantment: enchantment(row),
       purchasable: terminalStatus === "terminal",
       terminalStatus,
       nameStatus: required(row, "name_status"),
       hasCraftingRecipe,
       hasRefiningRecipe,
+      sourceUrl: required(row, "source_url"),
     };
     if (tier !== undefined) item.tier = tier;
     if (category !== undefined) item.category = category;
@@ -58,22 +66,31 @@ function parseRecipes(rows: CsvRow[], recipeType: Recipe["recipeType"], itemIds:
   for (const row of rows) {
     const recipeId = required(row, "recipe_id");
     const outputItemId = required(row, "output_item_id");
-    const outputQuantity = integer(row, "output_quantity")!;
+    const outputQuantity = positiveInteger(row, "output_quantity")!;
     const ingredientItemId = required(row, "ingredient_item_id");
-    const ingredientQuantity = integer(row, "ingredient_quantity")!;
+    const ingredientQuantity = positiveInteger(row, "ingredient_quantity")!;
     const sourceUrl = required(row, "source_url");
-    if (recipeType === "crafting") boolean(row, "return_eligible");
+    const validationStatus = required(row, "validation_status");
+    const craftBonusCity = recipeType === "crafting" ? optional(row, "craft_bonus_city") : undefined;
+    const notes = recipeType === "refining" ? optional(row, "notes") : undefined;
+    const returnEligible = recipeType === "crafting" ? boolean(row, "return_eligible") : undefined;
     if (!itemIds.has(outputItemId)) throw new Error(`CSV line ${row.line}, recipe '${recipeId}': unknown output '${outputItemId}'`);
     if (!itemIds.has(ingredientItemId)) throw new Error(`CSV line ${row.line}, recipe '${recipeId}': unknown ingredient '${ingredientItemId}'`);
     const recipe = recipes.get(recipeId);
-    if (recipe && (recipe.outputItemId !== outputItemId || recipe.outputQuantity !== outputQuantity || recipe.sourceUrl !== sourceUrl)) {
-      throw new Error(`CSV line ${row.line}, recipe '${recipeId}': inconsistent output`);
+    if (recipe && (recipe.outputItemId !== outputItemId || recipe.outputQuantity !== outputQuantity || recipe.sourceUrl !== sourceUrl || recipe.validationStatus !== validationStatus || recipe.craftBonusCity !== craftBonusCity || recipe.notes !== notes)) {
+      throw new Error(`CSV line ${row.line}, recipe '${recipeId}': inconsistent recipe metadata`);
     }
     if (recipe?.ingredients.some(({ itemId }) => itemId === ingredientItemId)) {
       throw new Error(`CSV line ${row.line}, recipe '${recipeId}': duplicate ingredient '${ingredientItemId}'`);
     }
-    if (recipe) recipe.ingredients.push({ itemId: ingredientItemId, quantity: ingredientQuantity });
-    else recipes.set(recipeId, { recipeId, outputItemId, outputQuantity, ingredients: [{ itemId: ingredientItemId, quantity: ingredientQuantity }], recipeType, sourceUrl });
+    const ingredient = { itemId: ingredientItemId, quantity: ingredientQuantity, ...(returnEligible === undefined ? {} : { returnEligible }) };
+    if (recipe) recipe.ingredients.push(ingredient);
+    else {
+      const value: Recipe = { recipeId, outputItemId, outputQuantity, ingredients: [ingredient], recipeType, validationStatus, sourceUrl };
+      if (craftBonusCity !== undefined) value.craftBonusCity = craftBonusCity;
+      if (notes !== undefined) value.notes = notes;
+      recipes.set(recipeId, value);
+    }
   }
   return [...recipes.values()];
 }
@@ -103,7 +120,7 @@ export async function importCatalog(inputDirectory: string, source: string, now 
     catalog,
     coverage: getCoverage(catalog),
     manifest: {
-      schemaVersion: "2",
+      schemaVersion: "3",
       importedAt: now.toISOString(),
       source,
       counts: { items: items.length, craftingRecipes: craftingRecipes.length, refiningRecipes: refiningRecipes.length },
