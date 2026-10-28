@@ -1,0 +1,6 @@
+item_id,display_name_en,tier,enchantment,category,has_crafting_recipe,has_refining_recipe,name_status,source_url
+T4_BAG,Adept's Bag,4,0,bag,true,false,name_verified,https://github.com/ao-data/ao-bin-dumps
+T4_CLOTH,Neat Cloth,4,0,cloth,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps
+T4_LEATHER,Worked Leather,4,0,leather,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps
+T4_FIBER,Hemp,4,0,fiber,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps
+T4_HIDE,Medium Hide,4,0,hide,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps

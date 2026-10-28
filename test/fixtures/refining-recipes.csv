@@ -1,0 +1,3 @@
+recipe_id,output_item_id,output_quantity,ingredient_item_id,ingredient_quantity,validation_status,notes,source_url
+T4_CLOTH,T4_CLOTH,1,T4_FIBER,2,fixture,,https://albiononline.com/news/guide-refining
+T4_LEATHER,T4_LEATHER,1,T4_HIDE,2,fixture,,https://albiononline.com/news/guide-refining

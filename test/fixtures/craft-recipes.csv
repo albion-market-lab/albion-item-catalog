@@ -1,0 +1,3 @@
+recipe_id,output_item_id,output_quantity,ingredient_item_id,ingredient_quantity,return_eligible,craft_bonus_city,validation_status,source_url
+T4_BAG,T4_BAG,1,T4_CLOTH,4,true,,fixture,https://github.com/ao-data/ao-bin-dumps
+T4_BAG,T4_BAG,1,T4_LEATHER,4,true,,fixture,https://github.com/ao-data/ao-bin-dumps

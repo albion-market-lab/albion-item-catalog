@@ -1,6 +1,25 @@
 # Albion Item Catalog
 
-> Master data item dan resep Albion Online untuk kebutuhan **Albion Market Lab**. Status: **seed master tersedia di Google Sheets; importer/code belum dibuat**.
+> Master data item dan resep Albion Online untuk kebutuhan **Albion Market Lab**. Status: **importer CSV tersedia; klasifikasi material terminal dilanjutkan di issue #2**.
+
+## Import snapshot CSV
+
+Siapkan direktori dengan `items.csv`, `craft-recipes.csv`, dan `refining-recipes.csv` sesuai kontrak tab di bawah, lalu jalankan:
+
+```sh
+pnpm install
+pnpm run import -- ./snapshot ./output snapshot-2026-10-28
+```
+
+Importer menghasilkan `output/catalog.json` dan `output/manifest.json`. Argumen ketiga adalah identitas versi/sumber snapshot. Semua item sementara diekspor dengan `terminalStatus: "unknown"` dan `purchasable: false`; issue #2 akan menetapkan aturan terminal tanpa menebak dari ketiadaan resep.
+
+Validasi pengembangan:
+
+```sh
+pnpm test
+pnpm typecheck
+pnpm build
+```
 
 Repositori ini menyimpan **data game yang relatif statis** (katalog item, crafting recipe, refining recipe), **bukan harga pasar**. Harga market yang berubah setiap scan disimpan oleh [market receiver](https://github.com/albion-market-lab/albion-market-receiver) di Google Sheets.
 
