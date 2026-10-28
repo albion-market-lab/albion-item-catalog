@@ -1,6 +1,21 @@
 item_id,display_name_en,tier,enchantment,category,has_crafting_recipe,has_refining_recipe,name_status,source_url
-T4_BAG,Adept's Bag,4,0,bag,true,false,name_verified,https://github.com/ao-data/ao-bin-dumps
-T4_CLOTH,Neat Cloth,4,0,cloth,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps
-T4_LEATHER,Worked Leather,4,0,leather,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps
-T4_FIBER,Hemp,4,0,fiber,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps
-T4_HIDE,Medium Hide,4,0,hide,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps
+T6_ARMOR_CLOTH_SET1,Master's Scholar Robe,6,0,equipment,true,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T5_SHOES_PLATE_SET1,Expert's Soldier Boots,5,0,equipment,true,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T6_CLOTH,Lavish Cloth,6,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T5_CLOTH,Ornate Cloth,5,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T4_CLOTH,Fine Cloth,4,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T3_CLOTH,Neat Cloth,3,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T2_CLOTH,Simple Cloth,2,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T6_FIBER,Amberleaf Cotton,6,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T5_FIBER,Skyflower,5,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T4_FIBER,Hemp,4,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T3_FIBER,Flax,3,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T2_FIBER,Cotton,2,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T5_METALBAR,Titanium Steel Bar,5,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T4_METALBAR,Steel Bar,4,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T3_METALBAR,Bronze Bar,3,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T2_METALBAR,Copper Bar,2,0,refined,false,true,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T5_ORE,Titanium Ore,5,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T4_ORE,Iron Ore,4,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T3_ORE,Tin Ore,3,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json
+T2_ORE,Copper Ore,2,0,raw,false,false,name_verified,https://github.com/ao-data/ao-bin-dumps/blob/1a469e53de028c5f85cdd80505f10cbd0a2515cf/items.json

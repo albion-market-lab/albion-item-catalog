@@ -1,3 +1,17 @@
 recipe_id,output_item_id,output_quantity,ingredient_item_id,ingredient_quantity,validation_status,notes,source_url
-T4_CLOTH,T4_CLOTH,1,T4_FIBER,2,fixture,,https://albiononline.com/news/guide-refining
-T4_LEATHER,T4_LEATHER,1,T4_HIDE,2,fixture,,https://albiononline.com/news/guide-refining
+refine:T6_CLOTH,T6_CLOTH,1,T6_FIBER,4,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T6_CLOTH,T6_CLOTH,1,T5_CLOTH,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T5_CLOTH,T5_CLOTH,1,T5_FIBER,3,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T5_CLOTH,T5_CLOTH,1,T4_CLOTH,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T4_CLOTH,T4_CLOTH,1,T4_FIBER,2,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T4_CLOTH,T4_CLOTH,1,T3_CLOTH,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T3_CLOTH,T3_CLOTH,1,T3_FIBER,2,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T3_CLOTH,T3_CLOTH,1,T2_CLOTH,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T2_CLOTH,T2_CLOTH,1,T2_FIBER,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T5_METALBAR,T5_METALBAR,1,T5_ORE,3,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T5_METALBAR,T5_METALBAR,1,T4_METALBAR,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T4_METALBAR,T4_METALBAR,1,T4_ORE,2,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T4_METALBAR,T4_METALBAR,1,T3_METALBAR,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T3_METALBAR,T3_METALBAR,1,T3_ORE,2,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T3_METALBAR,T3_METALBAR,1,T2_METALBAR,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining
+refine:T2_METALBAR,T2_METALBAR,1,T2_ORE,1,official_standard_recipe,RRR and Focus excluded,https://albiononline.com/news/guide-refining

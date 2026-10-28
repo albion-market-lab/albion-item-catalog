@@ -15,6 +15,7 @@ if (!input || !output || !source) {
     await Promise.all([
       writeFile(resolve(output, "catalog.json"), JSON.stringify(result.catalog, null, 2) + "\n"),
       writeFile(resolve(output, "manifest.json"), JSON.stringify(result.manifest, null, 2) + "\n"),
+      writeFile(resolve(output, "coverage.json"), JSON.stringify(result.coverage, null, 2) + "\n"),
     ]);
     console.log(`Imported ${result.manifest.counts.items} items, ${result.manifest.counts.craftingRecipes} crafting recipes, and ${result.manifest.counts.refiningRecipes} refining recipes.`);
   } catch (error) {

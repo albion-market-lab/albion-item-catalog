@@ -1,6 +1,6 @@
 # Albion Item Catalog
 
-> Master data item dan resep Albion Online untuk kebutuhan **Albion Market Lab**. Status: **importer CSV tersedia; klasifikasi material terminal dilanjutkan di issue #2**.
+> Master data item dan resep Albion Online untuk kebutuhan **Albion Market Lab**. Status: **importer CSV, klasifikasi terminal eksplisit, dan coverage report tersedia**.
 
 ## Import snapshot CSV
 
@@ -11,7 +11,7 @@ pnpm install
 pnpm run import -- ./snapshot ./output snapshot-2026-10-28
 ```
 
-Importer menghasilkan `output/catalog.json` dan `output/manifest.json`. Argumen ketiga adalah identitas versi/sumber snapshot. Semua item sementara diekspor dengan `terminalStatus: "unknown"` dan `purchasable: false`; issue #2 akan menetapkan aturan terminal tanpa menebak dari ketiadaan resep.
+Importer menghasilkan `output/catalog.json`, `output/manifest.json`, dan `output/coverage.json`. Argumen ketiga adalah identitas versi/sumber snapshot. Hanya raw resource standar yang terverifikasi berstatus `terminal` dan `purchasable: true`; item `unknown`/`unsupported` tidak dianggap bahan buy order. Detail aturan, sumber, dan known gaps ada di [catalog coverage](docs/catalog-coverage.md).
 
 Validasi pengembangan:
 
@@ -44,7 +44,8 @@ type CatalogItem = {
   displayName: string;
   tier?: number;
   category?: string;
-  craftable: boolean;
+  purchasable: boolean;        // true hanya untuk terminal terverifikasi
+  terminalStatus: "terminal" | "requires_recipe" | "unknown" | "unsupported";
 };
 
 type Recipe = {
@@ -55,12 +56,15 @@ type Recipe = {
     quantity: number;
   }>;
   recipeType: "crafting" | "refining";
+  sourceUrl: string;
 };
 ```
 
+Kontrak saat ini adalah `schemaVersion: "2"`; consumer harus memeriksa versi manifest sebelum memuat katalog.
+
 Aturan:
 - Kebutuhan artifact, Wood, Stone, material khusus, serta tier sebelumnya **harus dipertahankan**, tidak boleh disamakan dengan Ore/Hide/Fiber.
-- Item yang tidak punya resep (mis. material yang memang dibeli) ditandai sebagai bahan terminal/purchasable, bukan diberi resep tebakan.
+- Item yang tidak punya resep hanya ditandai terminal/purchasable bila cocok dengan aturan raw resource terverifikasi; sisanya `unknown` atau `unsupported`.
 - Resep atau hasil impor yang belum lengkap ditandai secara eksplisit agar calculator bisa menampilkan **data resep belum tersedia**.
 
 ## Scope awal
@@ -79,7 +83,7 @@ Cakupan katalog **tidak dibatasi** tiga jenis resource. Implementasi boleh mempr
 
 ## Dataset seed yang sudah tersedia (28 Oktober 2026)
 
-Google Sheets milik proyek telah diisi dengan **11.223 ID item** pada tab `Items`, **6.847 resep equipment** (15.325 ingredient rows) pada `Craft Recipes`, dan **115 resep refining standar** (225 ingredient rows) pada `Refining Recipes`. Tab `Market Prices` **sengaja kosong** sampai collector pribadi berjalan. Kode importer/JSON di repositori ini **belum diimplementasikan**.
+Google Sheets milik proyek telah diisi dengan **11.223 ID item** pada tab `Items`, **6.847 resep equipment** (15.325 ingredient rows) pada `Craft Recipes`, dan **115 resep refining standar** (225 ingredient rows) pada `Refining Recipes`. Tab `Market Prices` **sengaja kosong** sampai collector pribadi berjalan. Importer tersedia; full export tetap memerlukan CSV privat dari snapshot tersebut.
 
 Sumber seed dan status kualitas:
 - Upstream data game: [ao-data/ao-bin-dumps](https://github.com/ao-data/ao-bin-dumps).

@@ -1,7 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
+import { classifyMaterial } from "./classifier.js";
+import { getCoverage } from "./coverage.js";
 import { parseCsv, type CsvRow } from "./csv.js";
-import type { CatalogData, CatalogItem, Manifest, Recipe } from "./types.js";
+import type { CatalogData, CatalogItem, CoverageReport, Manifest, Recipe } from "./types.js";
 
 const required = (row: CsvRow, key: string): string => {
   const value = row.values[key];
@@ -31,18 +33,21 @@ function parseItems(rows: CsvRow[]): CatalogItem[] {
     const itemId = required(row, "item_id");
     if (seen.has(itemId)) throw new Error(`CSV line ${row.line}: duplicate item_id '${itemId}'`);
     seen.add(itemId);
-    boolean(row, "has_crafting_recipe");
-    boolean(row, "has_refining_recipe");
+    const hasCraftingRecipe = boolean(row, "has_crafting_recipe");
+    const hasRefiningRecipe = boolean(row, "has_refining_recipe");
     const tier = integer(row, "tier", true);
+    const category = optional(row, "category");
+    const terminalStatus = classifyMaterial(itemId, category, hasCraftingRecipe || hasRefiningRecipe);
     const item: CatalogItem = {
       itemId,
       displayName: optional(row, "display_name_en") ?? itemId,
-      purchasable: false,
-      terminalStatus: "unknown",
+      purchasable: terminalStatus === "terminal",
+      terminalStatus,
       nameStatus: required(row, "name_status"),
+      hasCraftingRecipe,
+      hasRefiningRecipe,
     };
     if (tier !== undefined) item.tier = tier;
-    const category = optional(row, "category");
     if (category !== undefined) item.category = category;
     return item;
   });
@@ -56,32 +61,49 @@ function parseRecipes(rows: CsvRow[], recipeType: Recipe["recipeType"], itemIds:
     const outputQuantity = integer(row, "output_quantity")!;
     const ingredientItemId = required(row, "ingredient_item_id");
     const ingredientQuantity = integer(row, "ingredient_quantity")!;
+    const sourceUrl = required(row, "source_url");
     if (recipeType === "crafting") boolean(row, "return_eligible");
     if (!itemIds.has(outputItemId)) throw new Error(`CSV line ${row.line}, recipe '${recipeId}': unknown output '${outputItemId}'`);
     if (!itemIds.has(ingredientItemId)) throw new Error(`CSV line ${row.line}, recipe '${recipeId}': unknown ingredient '${ingredientItemId}'`);
     const recipe = recipes.get(recipeId);
-    if (recipe && (recipe.outputItemId !== outputItemId || recipe.outputQuantity !== outputQuantity)) {
+    if (recipe && (recipe.outputItemId !== outputItemId || recipe.outputQuantity !== outputQuantity || recipe.sourceUrl !== sourceUrl)) {
       throw new Error(`CSV line ${row.line}, recipe '${recipeId}': inconsistent output`);
     }
     if (recipe?.ingredients.some(({ itemId }) => itemId === ingredientItemId)) {
       throw new Error(`CSV line ${row.line}, recipe '${recipeId}': duplicate ingredient '${ingredientItemId}'`);
     }
     if (recipe) recipe.ingredients.push({ itemId: ingredientItemId, quantity: ingredientQuantity });
-    else recipes.set(recipeId, { recipeId, outputItemId, outputQuantity, ingredients: [{ itemId: ingredientItemId, quantity: ingredientQuantity }], recipeType });
+    else recipes.set(recipeId, { recipeId, outputItemId, outputQuantity, ingredients: [{ itemId: ingredientItemId, quantity: ingredientQuantity }], recipeType, sourceUrl });
   }
   return [...recipes.values()];
 }
 
-export async function importCatalog(inputDirectory: string, source: string, now = new Date()): Promise<{ catalog: CatalogData; manifest: Manifest }> {
+function validateEnchantedDependencies(recipes: Recipe[]): void {
+  for (const recipe of recipes) {
+    const match = /^T([4-8])_(METALBAR|LEATHER|CLOTH|PLANKS)_LEVEL([1-4])@\3$/.exec(recipe.outputItemId);
+    if (!match) continue;
+    const tier = Number(match[1]);
+    const lowerTier = tier - 1;
+    const lowerId = tier === 4 ? `T3_${match[2]}` : `T${lowerTier}_${match[2]}_LEVEL${match[3]}@${match[3]}`;
+    if (!recipe.ingredients.some(({ itemId }) => itemId === lowerId)) {
+      throw new Error(`Recipe '${recipe.recipeId}': enchanted dependency '${lowerId}' is missing`);
+    }
+  }
+}
+
+export async function importCatalog(inputDirectory: string, source: string, now = new Date()): Promise<{ catalog: CatalogData; manifest: Manifest; coverage: CoverageReport }> {
   const load = async (name: string) => parseCsv(await readFile(join(inputDirectory, name), "utf8"));
   const items = parseItems(await load("items.csv"));
   const itemIds = new Set(items.map(({ itemId }) => itemId));
   const craftingRecipes = parseRecipes(await load("craft-recipes.csv"), "crafting", itemIds);
   const refiningRecipes = parseRecipes(await load("refining-recipes.csv"), "refining", itemIds);
+  validateEnchantedDependencies(refiningRecipes);
+  const catalog = { items, craftingRecipes, refiningRecipes };
   return {
-    catalog: { items, craftingRecipes, refiningRecipes },
+    catalog,
+    coverage: getCoverage(catalog),
     manifest: {
-      schemaVersion: "1",
+      schemaVersion: "2",
       importedAt: now.toISOString(),
       source,
       counts: { items: items.length, craftingRecipes: craftingRecipes.length, refiningRecipes: refiningRecipes.length },

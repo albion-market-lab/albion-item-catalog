@@ -3,10 +3,14 @@ export interface CatalogItem {
   displayName: string;
   tier?: number;
   category?: string;
-  purchasable: false;
-  terminalStatus: "unknown";
+  purchasable: boolean;
+  terminalStatus: TerminalStatus;
   nameStatus: string;
+  hasCraftingRecipe: boolean;
+  hasRefiningRecipe: boolean;
 }
+
+export type TerminalStatus = "terminal" | "requires_recipe" | "unknown" | "unsupported";
 
 export interface Recipe {
   recipeId: string;
@@ -14,6 +18,7 @@ export interface Recipe {
   outputQuantity: number;
   ingredients: Array<{ itemId: string; quantity: number }>;
   recipeType: "crafting" | "refining";
+  sourceUrl: string;
 }
 
 export interface CatalogData {
@@ -23,8 +28,18 @@ export interface CatalogData {
 }
 
 export interface Manifest {
-  schemaVersion: "1";
+  schemaVersion: "2";
   importedAt: string;
   source: string;
   counts: { items: number; craftingRecipes: number; refiningRecipes: number };
+}
+
+export interface CoverageReport {
+  totalItems: number;
+  craftableItems: number;
+  resolvedRecipes: number;
+  missingLabels: number;
+  unknownTerminalItems: number;
+  unsupportedItems: number;
+  danglingReferences: number;
 }
