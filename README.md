@@ -1,6 +1,6 @@
 # Albion Item Catalog
 
-> Master data item dan resep Albion Online untuk kebutuhan **Albion Market Lab**. Status: **perencanaan — implementasi belum dimulai**.
+> Master data item dan resep Albion Online untuk kebutuhan **Albion Market Lab**. Status: **seed master tersedia di Google Sheets; importer/code belum dibuat**.
 
 Repositori ini menyimpan **data game yang relatif statis** (katalog item, crafting recipe, refining recipe), **bukan harga pasar**. Harga market yang berubah setiap scan disimpan oleh [market receiver](https://github.com/albion-market-lab/albion-market-receiver) di Google Sheets.
 
@@ -57,6 +57,27 @@ Cakupan katalog **tidak dibatasi** tiga jenis resource. Implementasi boleh mempr
 - Resep refining dapat dirunut hingga material terminal tanpa mengarang kebutuhan bahan.
 - Referensi item/resep yang tidak valid terdeteksi otomatis.
 - Dataset hasil impor memiliki versi yang jelas.
+
+## Dataset seed yang sudah tersedia (28 Oktober 2026)
+
+Google Sheets milik proyek telah diisi dengan **11.223 ID item** pada tab `Items`, **6.847 resep equipment** (15.325 ingredient rows) pada `Craft Recipes`, dan **115 resep refining standar** (225 ingredient rows) pada `Refining Recipes`. Tab `Market Prices` **sengaja kosong** sampai collector pribadi berjalan. Kode importer/JSON di repositori ini **belum diimplementasikan**.
+
+Sumber seed dan status kualitas:
+- Upstream data game: [ao-data/ao-bin-dumps](https://github.com/ao-data/ao-bin-dumps).
+- Nama item: [vkorne-web/albion-market — items_raw.txt](https://github.com/vkorne-web/albion-market/blob/main/items_raw.txt), turunan dump game.
+- Resep equipment: [vkorne-web/albion-market — recipes.json](https://github.com/vkorne-web/albion-market/blob/main/recipes.json), ekstraksi sekunder dari dump. **Belum mencakup semua kategori crafting** dan perlu revalidasi ketika patch game.
+- Rasio refining standar: [panduan resmi Albion](https://albiononline.com/news/guide-refining). Enchanted Rock → Stone Block dengan hasil alternatif, resep faction token dan beberapa resep khusus **belum diimpor**.
+- **45 item** hanya memiliki ID karena tidak ada label nama pada snapshot; nilai `name_status=name_missing` berarti jangan tampilkan nama hasil tebakan.
+
+### Kontrak tab saat ini
+- `Items`: `item_id, display_name_en, tier, enchantment, category, has_crafting_recipe, has_refining_recipe, name_status, source_url`.
+- `Craft Recipes`: satu baris **per bahan**; `recipe_id, output_item_id, output_quantity, ingredient_item_id, ingredient_quantity, return_eligible, craft_bonus_city, validation_status, source_url`.
+- `Refining Recipes`: satu baris **per bahan**; `recipe_id, output_item_id, output_quantity, ingredient_item_id, ingredient_quantity, validation_status, notes, source_url`.
+- `Market Prices`: tabel harga **yang dikelola receiver**, bukan milik catalog. Skema ada di README [market receiver](https://github.com/albion-market-lab/albion-market-receiver).
+
+Akses/ID spreadsheet tidak dicantumkan di repositori publik. Untuk tahap berikutnya, buat importer yang bisa regenerasi master JSON ber-versi dari sumber game, audit perubahan, dan menandai resep yang tidak didukung.
+
+**Sumber harga tetap private-only:** tidak mengambil harga dari API komunitas dan tidak mengunggah hasil scan pribadi ke komunitas. Sheet harga masih kosong hingga receiver diimplementasikan.
 
 ## Ekosistem repositori
 
