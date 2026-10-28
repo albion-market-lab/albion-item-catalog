@@ -1,1 +1,73 @@
-# albion-item-catalog
+# Albion Item Catalog
+
+> Master data item dan resep Albion Online untuk kebutuhan **Albion Market Lab**. Status: **perencanaan — implementasi belum dimulai**.
+
+Repositori ini menyimpan **data game yang relatif statis** (katalog item, crafting recipe, refining recipe), **bukan harga pasar**. Harga market yang berubah setiap scan disimpan oleh [market receiver](https://github.com/albion-market-lab/albion-market-receiver) di Google Sheets.
+
+## Tujuan
+- Mendukung katalog equipment yang dapat dibuat, termasuk berbagai tier, enchantment, jenis armor/weapon, dan material khusus bila ada.
+- Menyediakan hubungan resep yang bisa ditelusuri mundur: output craft → refined material → bahan dasar.
+- Memakai **item ID asli dan stabil**, bukan nama tampilan sebagai primary key.
+- Memisahkan data sumber game dari format terstandardisasi yang dipakai calculator.
+
+## Rencana sumber data
+- Kandidat data dump komunitas: [ao-data/ao-bin-dumps](https://github.com/ao-data/ao-bin-dumps).
+- **Verifikasi struktur dan kelengkapan resep dari versi data yang diunduh** sebelum menentukan parser. Jangan mengasumsikan semua field sudah tersedia atau semua item memiliki resep.
+- Simpan informasi versi/build game serta waktu impor agar perubahan resep dapat dilacak.
+
+## Kontrak data yang ditargetkan
+
+Contoh bentuk logis (ilustrasi, **bukan** resep Albion yang sudah diverifikasi):
+
+```ts
+type CatalogItem = {
+  itemId: string;              // ID game kanonis, termasuk enchantment bila relevan
+  displayName: string;
+  tier?: number;
+  category?: string;
+  craftable: boolean;
+};
+
+type Recipe = {
+  outputItemId: string;
+  outputQuantity: number;       // hasil per satu craft/refine
+  ingredients: Array<{
+    itemId: string;
+    quantity: number;
+  }>;
+  recipeType: "crafting" | "refining";
+};
+```
+
+Aturan:
+- Kebutuhan artifact, Wood, Stone, material khusus, serta tier sebelumnya **harus dipertahankan**, tidak boleh disamakan dengan Ore/Hide/Fiber.
+- Item yang tidak punya resep (mis. material yang memang dibeli) ditandai sebagai bahan terminal/purchasable, bukan diberi resep tebakan.
+- Resep atau hasil impor yang belum lengkap ditandai secara eksplisit agar calculator bisa menampilkan **data resep belum tersedia**.
+
+## Scope awal
+1. Import dan normalisasi ID serta nama item.
+2. Ekstraksi resep crafting dan refining yang terverifikasi.
+3. Validasi referensi bahan, kuantitas, dan resep bertingkat.
+4. Ekspor JSON ber-versi untuk dikonsumsi [calculator](https://github.com/albion-market-lab/albion-crafting-calculator) dan [web](https://github.com/albion-market-lab/albion-crafting-web).
+
+Cakupan katalog **tidak dibatasi** tiga jenis resource. Implementasi boleh memprioritaskan equipment non-artifact T4–T8 pada tahap awal tanpa membuat desain datanya tertutup untuk item lain.
+
+## Selesai jika
+- Satu item craftable dapat ditemukan berdasarkan ID dan dikembalikan bersama resepnya.
+- Resep refining dapat dirunut hingga material terminal tanpa mengarang kebutuhan bahan.
+- Referensi item/resep yang tidak valid terdeteksi otomatis.
+- Dataset hasil impor memiliki versi yang jelas.
+
+## Ekosistem repositori
+
+| Repositori | Tanggung jawab |
+| --- | --- |
+| [albion-item-catalog](https://github.com/albion-market-lab/albion-item-catalog) | Master data item dan resep crafting/refining |
+| [albion-market-receiver](https://github.com/albion-market-lab/albion-market-receiver) | Menerima scan market pribadi dan menyimpan harga ke Google Sheets |
+| [albion-crafting-calculator](https://github.com/albion-market-lab/albion-crafting-calculator) | Menghitung kebutuhan bahan, estimasi modal, dan rekomendasi kota BO |
+| [albion-crafting-web](https://github.com/albion-market-lab/albion-crafting-web) | Antarmuka untuk merencanakan banyak target crafting |
+
+**Alur:** Albion Online → collector lokal → receiver → Google Sheets → web UI + calculator. Katalog resep berasal dari data game, **bukan** dari Google Sheets.
+
+## Di luar scope
+Collector network, Google Sheets, harga market, UI, dan perhitungan rekomendasi buy order.
