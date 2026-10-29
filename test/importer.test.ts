@@ -37,6 +37,21 @@ describe("catalog import", () => {
     expect(coverage).toEqual({ totalItems: 20, craftableItems: 2, craftingRecipes: 2, refiningRecipes: 9, resolvedRecipes: 11, missingCraftingRecipes: 0, missingRefiningRecipes: 0, missingLabels: 0, verifiedTerminalItems: 9, unknownTerminalItems: 0, unsupportedItems: 0, danglingReferences: 0 });
   });
 
+  it("normalizes source-specific standard raw categories to the canonical value", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "catalog-raw-category-"));
+    await Promise.all([
+      writeFile(join(directory, "items.csv"), "item_id,display_name_en,tier,enchantment,category,has_crafting_recipe,has_refining_recipe,name_status,source_url\nT2_ORE,Copper Ore,2,0,Raw: Ore,false,false,name_verified,x\nT4_HIDE_LEVEL1@1,Runite Hide,4,1,Raw: Hide,false,false,name_verified,x\nT4_ARTEFACT_MAIN_SWORD_HELL,Artifact,4,0,Other,false,false,name_verified,x\n"),
+      writeFile(join(directory, "craft-recipes.csv"), "recipe_id,output_item_id,output_quantity,ingredient_item_id,ingredient_quantity,return_eligible,craft_bonus_city,validation_status,source_url\n"),
+      writeFile(join(directory, "refining-recipes.csv"), "recipe_id,output_item_id,output_quantity,ingredient_item_id,ingredient_quantity,validation_status,notes,source_url\n"),
+    ]);
+    const { catalog } = await importCatalog(directory, "raw-category");
+    expect(catalog.items.map(({ itemId, category, terminalStatus, purchasable }) => ({ itemId, category, terminalStatus, purchasable }))).toEqual([
+      { itemId: "T2_ORE", category: "raw", terminalStatus: "terminal", purchasable: true },
+      { itemId: "T4_HIDE_LEVEL1@1", category: "raw", terminalStatus: "terminal", purchasable: true },
+      { itemId: "T4_ARTEFACT_MAIN_SWORD_HELL", category: "Other", terminalStatus: "terminal", purchasable: true },
+    ]);
+  });
+
   it("preserves zero/max enchantment and per-ingredient crafting metadata", async () => {
     const directory = await mkdtemp(join(tmpdir(), "catalog-metadata-"));
     await Promise.all([

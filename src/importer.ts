@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { classifyMaterial } from "./classifier.js";
+import { classifyMaterial, isStandardRawResource } from "./classifier.js";
 import { getCoverage } from "./coverage.js";
 import { parseCsv, type CsvRow } from "./csv.js";
 import type { CatalogData, CatalogItem, CoverageReport, Manifest, Recipe } from "./types.js";
@@ -42,7 +42,7 @@ function parseItems(rows: CsvRow[]): CatalogItem[] {
     const hasCraftingRecipe = boolean(row, "has_crafting_recipe");
     const hasRefiningRecipe = boolean(row, "has_refining_recipe");
     const tier = positiveInteger(row, "tier", true);
-    const category = optional(row, "category");
+    const category = isStandardRawResource(itemId) ? "raw" : optional(row, "category");
     const terminalStatus = classifyMaterial(itemId, category, hasCraftingRecipe || hasRefiningRecipe);
     const item: CatalogItem = {
       itemId,
